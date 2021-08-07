@@ -2,11 +2,12 @@
 
 int main()
 {
-  Logger logger("settings.json", Level::Info);
+  setm::Logger::config("settings.json", setm::Level::Error);
 
-  logger.write("Test message...");
-  logger.write("Three integers! {} {} {}", 5, 3, 4);
-  logger.write("Integer: {}, string: {}, char: {}, boolean: {}", 255, "str", 'a', false);
+  setm::Logger::info("Welcome, brother!");
+  setm::Logger::warning("True is indeed {}", true);
+  setm::Logger::error("{} equals {}", 5, "five");
+  setm::Logger::debug("And this will never be shown!");
 
   return 0;
 }
