@@ -3,12 +3,12 @@
 
 int main()
 {
-  Logger::config("settings.json", Level::Error);
+  setm::Logger::config("settings.json", setm::Level::Error);
 
-  Logger::info("Info test");       // должно сработать.
-  Logger::warning("Warning test"); // должно сработать.
-  Logger::error("Error test");     // должно сработать.
-  Logger::debug("Debug test");     // не должно сработать.
+  setm::Logger::info("Welcome, brother!");
+  setm::Logger::warning("True is indeed {}", true);
+  setm::Logger::error("{} equals {}", 5, "five");
+  setm::Logger::debug("And this will never be shown!");
 
   return 0;
 }
