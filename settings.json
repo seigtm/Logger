@@ -1,0 +1,13 @@
+{
+  "enable": true,
+
+  "datetime": {
+    "print": true,
+    "format": "{:%c}"
+  },
+
+  "output": {
+    "format": "file",
+    "path": "log"
+  }
+}
