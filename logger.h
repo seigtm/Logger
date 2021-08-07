@@ -2,11 +2,11 @@
 #include "fmt/core.h"
 #include "fmt/chrono.h"
 #include <fstream>
-#include <iomanip>
 #include <sstream>
-#include <chrono>
-#include <string>
 #include <iostream>
+// #include <chrono>
+// #include <string>
+// #include <iomanip>
 
 enum class Level
 {
@@ -50,6 +50,8 @@ public:
          const Level &level = Level::Debug)
       : mLevel{level}
   {
+    mLevel = level;
+
     std::ifstream jsonFile(pathToJSON);
 
     // If JSON File not opened.
@@ -98,7 +100,8 @@ public:
     }
     else
     {
-      // static_assert("");
+      // Output type - Console by default.
+      mOutputType = OutputType::Console;
     }
   }
 
@@ -136,12 +139,23 @@ private:
     }
   }
 
+  std::string _getPrefix()
+  {
+    std::stringstream prefix;
+    prefix << getDateTime(mDateTimeFormat)
+           << " "
+           << std::to_string(mLevel)
+           << " ";
+
+    return prefix.str();
+  }
+
   Level mLevel;
-  OutputType mOutputType;
 
   bool mIsDateTimePrinting;
   std::string mDateTimeFormat;
 
+  OutputType mOutputType;
   std::string mOutputFilePath;
 };
 
@@ -149,10 +163,7 @@ template <class... Args>
 void Logger::write(const std::string &format, Args... args)
 {
   std::stringstream logRecord;
-  logRecord << getDateTime(mDateTimeFormat)
-            << " "
-            << std::to_string(mLevel)
-            << " "
+  logRecord << _getPrefix()
             << fmt::format(format, args...)
             << "\n";
 
@@ -165,10 +176,7 @@ template <>
 void Logger::write(const std::string &message)
 {
   std::stringstream logRecord;
-  logRecord << getDateTime(mDateTimeFormat)
-            << " "
-            << std::to_string(mLevel)
-            << " "
+  logRecord << _getPrefix()
             << message
             << "\n";
 
