@@ -3,11 +3,12 @@
 
 int main()
 {
-  Logger logger("settings.json", Level::Debug);
+  Logger::config("settings.json", Level::Error);
 
-  logger.write("Test message...");
-  logger.write("Ну-ка встаньте цифры в ряд! {} {} {}", 5, 3, 4);
-  logger.write("Integer: {}, string: {}, char: {}, boolean: {}", 255, "str", 'a', false);
+  Logger::info("Info test");       // должно сработать.
+  Logger::warning("Warning test"); // должно сработать.
+  Logger::error("Error test");     // должно сработать.
+  Logger::debug("Debug test");     // не должно сработать.
 
   return 0;
 }

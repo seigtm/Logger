@@ -2,11 +2,11 @@
 #include "fmt/core.h"
 #include "fmt/chrono.h"
 #include <fstream>
-#include <iomanip>
 #include <sstream>
-#include <chrono>
-#include <string>
 #include <iostream>
+// #include <chrono>
+// #include <string>
+// #include <iomanip>
 
 enum class Level
 {
@@ -46,10 +46,11 @@ namespace std
 class Logger
 {
 public:
-  Logger(const std::string &pathToJSON = "settings.json",
-         const Level &level = Level::Debug)
-      : mLevel{level}
+  static void config(const std::string &pathToJSON = "settings.json",
+                     const Level &level = Level::Debug)
   {
+    mLevel = level;
+
     std::ifstream jsonFile(pathToJSON);
 
     // If JSON File not opened.
@@ -98,18 +99,55 @@ public:
     }
     else
     {
-      // static_assert("");
+      // Output type - Console by default.
+      mOutputType = OutputType::Console;
     }
   }
 
-  ~Logger()
+  template <typename... Args>
+  static void info(const std::string &format, Args... args)
   {
+    if (mLevel >= Level::Info)
+      get().write(format, args...);
+  }
+
+  template <typename... Args>
+  static void warning(const std::string &format, Args... args)
+  {
+    if (mLevel >= Level::Warning)
+      get().write(format, args...);
+  }
+
+  template <typename... Args>
+  static void error(const std::string &format, Args... args)
+  {
+    if (mLevel >= Level::Error)
+      get().write(format, args...);
+  }
+
+  template <typename... Args>
+  static void debug(const std::string &format, Args... args)
+  {
+    if (mLevel >= Level::Debug)
+      get().write(format, args...);
+  }
+
+
+private:
+  Logger(){}
+  Logger(const Logger&) = delete;
+	Logger& operator= (const Logger&) = delete;
+  ~Logger(){}
+
+  static Logger& get()
+  {
+    static Logger instance;
+    return instance;
   }
 
   template <typename... Args>
   void write(const std::string &format, Args... args);
 
-private:
   std::string getDateTime(const std::string &format)
   {
     if (format.empty())
@@ -136,23 +174,31 @@ private:
     }
   }
 
-  Level mLevel;
-  OutputType mOutputType;
+  std::string _getPrefix()
+  {
+    std::stringstream prefix;
+    prefix << getDateTime(mDateTimeFormat)
+           << " "
+           << std::to_string(mLevel)
+           << " ";
 
-  bool mIsDateTimePrinting;
-  std::string mDateTimeFormat;
+    return prefix.str();
+  }
 
-  std::string mOutputFilePath;
+  static Level mLevel;
+
+  static bool mIsDateTimePrinting;
+  static std::string mDateTimeFormat;
+
+  static OutputType mOutputType;
+  static std::string mOutputFilePath;
 };
 
 template <class... Args>
 void Logger::write(const std::string &format, Args... args)
 {
   std::stringstream logRecord;
-  logRecord << getDateTime(mDateTimeFormat)
-            << " "
-            << std::to_string(mLevel)
-            << " "
+  logRecord << _getPrefix()
             << fmt::format(format, args...)
             << "\n";
 
@@ -165,10 +211,7 @@ template <>
 void Logger::write(const std::string &message)
 {
   std::stringstream logRecord;
-  logRecord << getDateTime(mDateTimeFormat)
-            << " "
-            << std::to_string(mLevel)
-            << " "
+  logRecord << _getPrefix()
             << message
             << "\n";
 
@@ -176,3 +219,9 @@ void Logger::write(const std::string &message)
 
   _write(str);
 }
+
+Level Logger::mLevel = Level::Info;
+bool Logger::mIsDateTimePrinting = true;
+std::string Logger::mDateTimeFormat = "{:%c}";
+OutputType Logger::mOutputType = OutputType::Console;
+std::string Logger::mOutputFilePath = "log.log";

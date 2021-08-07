@@ -7,7 +7,7 @@
   },
 
   "output": {
-    "format": "file",
+    "format": "console",
     "path": "log"
   }
 }
