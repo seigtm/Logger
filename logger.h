@@ -18,7 +18,8 @@ namespace setm
   enum class OutputType
   {
     File,
-    Console
+    Console,
+    None
   };
 }
 
@@ -66,6 +67,7 @@ namespace setm
       // If logger disabled.
       if (!json[0]["enable"])
       {
+        mOutputType = OutputType::None;
         return;
       }
 
@@ -160,6 +162,9 @@ namespace setm
         std::cout << message;
         break;
 
+      case OutputType::None:
+        break;
+      
       case OutputType::File:
         std::ofstream outputFile(mOutputFilePath, std::ios::app);
         outputFile << message;
